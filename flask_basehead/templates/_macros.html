@@ -1,24 +1,11 @@
 {% macro render_person(obj) %}
-    <table border="0">
-        {% for itm in obj %}
-            {% if itm == 'avatar_url' %}
-                <img src="{{ obj[itm] }}" />
-            {% elif itm == 'fullsize_avatar_url' %}
-                <p></p>
-            {% elif itm == 'id' %}
-                <p></p>
-            {% else %}
-                <tr>
-                    <td>Creator</td>
-                </tr>
-                <tr> 
-                    <td>{{ itm }}:</td>
-                    <td>{{ obj[itm] }}</td>
-                </tr>
-            {% endif %}
-       {% endfor %}
-       <hr />
-    </table>
+    <div class="basecamp-person">
+        <div class="wrapper">
+            <p><strong>{{ obj['name'] }}</strong></p>
+            <img src="{{ obj['avatar_url'] }}" style="float:none;" />
+        </div>
+    </div>
+    <hr />
 {% endmacro %}
 
 {% macro render_todo(todo) %}
@@ -26,17 +13,19 @@
     <table border="0">
         {% for itm in todo %}
             {% if itm == 'creator' %}
+                <p>This todo was created by:
                 {{ render_person(todo[itm]) }}
+                </p>
             {% else %}
                 {% if todo[itm] != False and todo[itm] != None %}
                     {% if itm == 'comments' %}
+                        <h3><strong>Comments</strong></h3>
                         {% for comment in todo[itm] %}
                             {{ render_comment(comment) }}
                         {% endfor %}
                     {% elif itm == 'subscribers' %}
                         {{ render_subscribers(todo[itm]) }}
                     {% else %}
-                    <br />
                     {% endif %}
                 {% endif %}
             {% endif %}
@@ -53,9 +42,8 @@
 {% endmacro %}
     
 {% macro render_comment(comment) %}
-    {{ comment.creator['name'] }}
-    <p>Says:</p>
-    <p>{{ comment.content }}</p>
+   <p> {{ comment.creator['name'] }} Says:</p>
+   <p>{{ comment.content|safe }}</p>
 {% endmacro %}
 
 {% macro render_subscribers(subs) %}
