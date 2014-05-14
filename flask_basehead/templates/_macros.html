@@ -1,0 +1,68 @@
+{% macro render_person(obj) %}
+    <table border="0">
+        {% for itm in obj %}
+            {% if itm == 'avatar_url' %}
+                <img src="{{ obj[itm] }}" />
+            {% elif itm == 'fullsize_avatar_url' %}
+                <p></p>
+            {% elif itm == 'id' %}
+                <p></p>
+            {% else %}
+                <tr>
+                    <td>Creator</td>
+                </tr>
+                <tr> 
+                    <td>{{ itm }}:</td>
+                    <td>{{ obj[itm] }}</td>
+                </tr>
+            {% endif %}
+       {% endfor %}
+       <hr />
+    </table>
+{% endmacro %}
+
+{% macro render_todo(todo) %}
+    <h2>{{ todo.content }}</h2>
+    <table border="0">
+        {% for itm in todo %}
+            {% if itm == 'creator' %}
+                {{ render_person(todo[itm]) }}
+            {% else %}
+                {% if todo[itm] != False and todo[itm] != None %}
+                    {% if itm == 'comments' %}
+                        {% for comment in todo[itm] %}
+                            {{ render_comment(comment) }}
+                        {% endfor %}
+                    {% elif itm == 'subscribers' %}
+                        {{ render_subscribers(todo[itm]) }}
+                    {% else %}
+                    <br />
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </table>
+{% endmacro %}
+ 
+{% macro render_todo_link(num) %}
+    <a href="/task/{{ num }}">Go to task page</a>
+{% endmacro %}
+
+{% macro render_todos_link() %}
+    <a href="{{ url_for('tasks') }}">go back to tasks page</a>
+{% endmacro %}
+    
+{% macro render_comment(comment) %}
+    {{ comment.creator['name'] }}
+    <p>Says:</p>
+    <p>{{ comment.content }}</p>
+{% endmacro %}
+
+{% macro render_subscribers(subs) %}
+    <p>Subscribers</p>
+    <ul>
+    {% for sub in subs %}
+        <li>{{ sub.name }}</li>
+    {% endfor %}
+    </ul>
+{% endmacro %}
