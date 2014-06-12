@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+{% block content %}
+<style>
+    .header {background-color:light-grey!important;}
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="header">
+                <div class="brand">
+                    <h2>My Header <small>Cool huh</small></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col-xs-1 col-md-8">
+        {% if tasks %}
+            <div>
+                <div class="pull-right">
+                    {% for task in tasks %}
+                    <label class="checkbox-inline">
+                        <label class="label label-default">
+                            <input type="checkbox" name="{{ task['content'] }}" id="{{ task['id'] }}" value="{{ task['content'] }}" 
+                            {% if task['completed'] %}checked{% endif %} />{{ task['content'] }} Created by: {{ task['creator']['name'] }}
+                        </label>
+                    </label>
+                    <br />
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-2">
+            <span class="label label-default">Sidebar</span>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

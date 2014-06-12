@@ -1,49 +1,210 @@
-{% macro render_person(obj) %}
-    <div class="basecamp-person">
+{% macro render_form(form) %}
+    {% for itm in form %}
+         {% if itm.type == 'hidden_field' %}
+            {{ form.hidden_tag() }}
+        {% else %}
+            {{ itm() }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_project_buckets(bkts) %}
+    {% for bkt in bkts %}
+        <div class="panel panel-default">
+            <div id="{{ bkt }}" class="panel-heading">{{ bkt }}  
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% for x in bkts[bkt] %}
+                    <a class="active list-group-item" href="{{ url_for('todolist',idnum=x['id']) }}">{{ x['name'] }} <span class="pull-right">has <span class="badge badge-inverse">{{ x['assigned_todos']|count }}</span> open todos left</span></a>
+                    {% for task in x['assigned_todos'] %}
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <input type="checkbox">
+                            </span>
+                            <a class=list-group-item href="{{ url_for('tasks',taskid=task['id']) }}">{{ task['content'] }}</a>
+                        </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_todo_buckets(bkts,bl) %}
+    {% for bkt,count in bl.items() %}
+        <div class="panel panel-default">
+            <div class="panel-heading">{{ bkt }} has {{ count }} // {{ bkts['id'] }} 
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% for x in bkts[bkt] %}
+                        <a class="list-group-item" href="{{ url_for('tasks',taskid=x['id']) }}">{{ x['content'] }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_person_inline(obj,side="left") %}
+    <div class="basecamp-person" style="margin-bottom:-4px;">
         <div class="wrapper">
-            <p><strong>{{ obj['name'] }}</strong></p>
-            <img src="{{ obj['avatar_url'] }}" style="float:none;" />
+            <a href="{{ url_for('profile',userid=obj['id']) }}">
+                <img class="img-thumbnail" src="{{ obj['avatar_url'] }}" style="margin-top:-15px;" />
+                <p><strong>{{ obj['name'] }}</strong>
+                </p>
+            </a>
         </div>
     </div>
     <hr />
 {% endmacro %}
 
-{% macro render_todo(todo) %}
-    <h2>{{ todo.content }}</h2>
-    <table border="0">
-        {% for itm in todo %}
-            {% if itm == 'creator' %}
-                <p>This todo was created by:
-                {{ render_person(todo[itm]) }}
-                </p>
-            {% else %}
-                {% if todo[itm] != False and todo[itm] != None %}
-                    {% if itm == 'comments' %}
-                        <h3><strong>Comments</strong></h3>
-                        {% for comment in todo[itm] %}
-                            {{ render_comment(comment) }}
-                        {% endfor %}
-                    {% elif itm == 'subscribers' %}
-                        {{ render_subscribers(todo[itm]) }}
-                    {% else %}
-                    {% endif %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
+{% macro render_person(obj) %}
+    <div class="basecamp-person" >
+        <div class="wrapper">
+            <p><strong>{{ obj['name'] }}</strong></p>
+            <img class="img-thumbnail" src="{{ obj['avatar_url'] }}" style="float:none;" />
+        </div>
+    </div>
+    <hr />
+{% endmacro %}
+
+{% macro render_todolist(todolist) %}
+<div class=well>
+    <h2>{{ todolist['name'] }}</h2>
+</div>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Completed</th>
+                <th>created at</th>
+                <th>due date</th>
+                <th>data</th>
+                <th>created by</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for itm in todolist['assigned_todos'] %}
+            <tr>
+                <td>{{ itm['completed'] }}</td>
+                <td>{{ itm['created_at']|date }}</td>
+                <td>{{ itm['due_at']|date }}</td>
+                <td>{{ itm['content']|safe }}</td>
+                <td width="30%">{{ render_person_inline(itm['creator']) }}</td>
+                <td><a class="btn btn-default" href="{{ url_for('tasks',taskid=itm['id']) }}">See Todo</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
+{% endmacro %}
+
+{% macro render_project(project) %}
+    {% set docs = project['documents'] %}
+    {% set atts = project['attachments'] %}
+    {% set todos = project['todolists'] %}
+    {% set topics = project['topics'] %}
+                <div class="page-header">
+                    <h1>{{ project['name'] }} <small>{% if project['description'] %}{{ project['description'] }}{% endif %}</hr>
+                            {% if project['is_client_project'] %}Client{% else %}Internal{% endif %} Project
+                    </small></h1>
+                </div>
+                <div class="well">
+                    <h5 class="label-primary label">created: {{ project['created_at']|date }}</h5>
+                    <h5 class="label label-primary">Updated: {{ project['updated_at']|date }}</h5>
+                    <p class="text-info">Project Created By:</p>
+                    {{ render_person(project['creator']) }}
+                </div>
+                <div class="list-group">
+                {% if docs['count'] >= 1 %}
+                    <a class="list-group-item" style="width:100%;" href="{{ docs['url'] }}">See Documents<span class="badge">{{ docs['count'] }}</span></a>
+                {% endif %}
+                {% if atts['count'] >= 1%}
+                    <a class="list-group-item" style="width:100%;" href="{{ url_for('attachments',url=atts['url']) }}">See Attachments<span class="badge">{{ atts['count'] }}</span></a>
+                {% endif %}
+                {% if todos['remaining_count'] >= 1 %}
+                    <a class="list-group-item" style="width:100%;" href="{{ url_for('tasklists') }}">See Todo Lists<span class="badge">{{ todos['remaining_count'] }}</span></a>
+                {% endif %}
+                {% if topics['count'] >= 1 %}
+                    <a class="list-group-item" style="width:100%;" href="{{ topics['url'] }}">See Topics<span class="badge">{{ topics['count'] }}</span></a>
+                {% endif %}
+                </div>
+{% endmacro %}
+                    
+                        
+
+
+{% macro render_todo(todo) %}
+    <table border="0" class="table">
+        <thead>
+            <tr>
+                <th><h2 class=page-header><small>{{ todo['content'] }}</small></h2></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+              <td width="100%;">This todo was created by:
+                    {{ render_person(todo['creator']) }}
+              </td>
+              <td class="pull-left" style="position:relative;left:-400px;width:195px;">
+                    {{ render_subscribers(todo['subscribers']) }}
+             </td>
+         </tr>
+         <tr>
+            <td>{{ render_three_button_input('add','update','see-all') }}</td>
+         </tr>
+         <tr>
+             <td>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <p class="lead">
+                                    <strong>Comments</strong>
+                                </p>
+                            </th>
+                       </tr>
+                   </thead>
+                   <tbody>
+                       {% if todo['comments'] %}
+                           {% for comment in todo['comments'] %}
+                               <tr>
+                                  {{ render_comment(comment) }}
+                               </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>    
+</table>
 {% endmacro %}
  
 {% macro render_todo_link(num) %}
-    <a href="/task/{{ num }}">Go to task page</a>
+    <a href="/tasks/{{ num }}">Go to task page</a>
 {% endmacro %}
 
-{% macro render_todos_link() %}
-    <a href="{{ url_for('tasks') }}">go back to tasks page</a>
+{% macro render_todo_links(lst=1,nxt=0) %}
+<div class="container">
+    <div class="row">
+        <div class="span1">
+            {{ render_todo_list_link() }}
+        </div>
+        <div class="span1">
+            {{ render_last_link(lst) }}
+        </div>
+        <div class="span1">
+            {{ render_next_link(nxt) }}
+        </div>
+    </div>
+</div>
 {% endmacro %}
     
 {% macro render_comment(comment) %}
-   <p> {{ comment.creator['name'] }} Says:</p>
-   <p>{{ comment.content|safe }}</p>
+    <td>{{ comment.creator['name'] }} Says:</td>
+    <td>{{ comment.content|safe }}</td>
 {% endmacro %}
 
 {% macro render_subscribers(subs) %}
@@ -53,4 +214,241 @@
         <li>{{ sub.name }}</li>
     {% endfor %}
     </ul>
+    {% endmacro %}
+
+
+{% macro render_next_link(num) %}
+    <a class="{% if not num %}disabled {% endif %}pull-right btn btn-default" href="{{ url_for('tasks',taskid=num) }}">Next todo</a>
+{% endmacro %}
+
+{% macro render_last_link(num) %}
+    <a class="{% if not num  %}disabled {% endif %}pull-left btn btn-default" href="{{ url_for('tasks',taskid=num) }}">Previous todo</a>
+{% endmacro %}
+
+{% macro render_todo_list_link() %}
+    <a style="padding-left:385px;" href="{{ url_for('tasks') }}">go back to tasks page</a>
+{% endmacro %}
+
+{% macro render_lite_project(project) %}
+<a class="btn btn-default" href="{{ url_for('projects',project_id=project.id) }}">{{ project.name }}{% if project.starred %}<span style="font-size:1.5em;color:red;">*</span>{% endif %}</a>
+{% endmacro %}
+
+
+{% macro render_attachment(att) %}
+    <div class="well">
+        <h3 class=lead>File:</h3>
+        <h3>{{ att['name'] }}</h3>
+        <h3 class="lead">Created By: {{ att['creator']['name'] }}</h3>
+        {{ render_person(att['creator']) }}
+        <ul>
+            <li>Type: {{ att['content_type'] }}</li>
+            <li>Size: {{ att['byte_size']|filesizeformat }}</li>
+        </ul>
+        <a href="{{ att['url'] }}" class="btn btn-default">Download</a>
+    </div>
+{% endmacro %}
+
+{% macro render_three_button_input(btn1,btn2,btn3) %} 
+    <div class="row">
+       <div class="col-lg-8 col-offset-4">
+           <div class=input-group>
+               <form>
+                   <div class="btn-group btn-group-justified">
+                       <div class=btn-group>
+                           <button type=button id=btn1 class="btn btn-default">
+                               <span class="glyphicon glyphicon-comment"></span>
+                               {{ btn1 }}</button>
+                        </div>
+                       <div class=btn-group>
+                           <button type=button id=btn2 class="btn btn-default">
+                               <span class="glyphicon glyphicon-export"></span>
+                                {{ btn2 }}</button>
+                        </div>
+                       <div class=btn-group>
+                           <button type=button id=btn3 class="btn btn-default">
+                               <span class="glyphicon glyphicon-th-large"></span>
+                                {{ btn3 }}</button>
+                       </div>
+                    </div> 
+                    <textarea class=form-control type="textarea" rows=5 value="input" id="text" >
+                    </textarea>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_event(event) %}
+     <p class="lead">Target:<small> {{ event['target'] }}</small></p>
+     <p>{{ event['summary']|safe }}</p>
+     <p>Date: {{ event['updated_at']|date }}</p>
+     {% if 'raw_excerpt' in event %}
+          <p class="lead">Comment: <br /></p>
+          <p>{{ event['raw_excerpt']|safe }}</p>
+     {% endif %}
+{% endmacro %}
+
+{% macro render_event_action(event) %}
+     <strong>{{ event['action']|truncate(20,end='') }}</strong>
+     - from a  {{ event['bucket']['type'] }}
+     - {{ event['bucket']['name'] }}
+     - {{ event['created_at']|date }}
+{% endmacro %}
+
+{% macro render_pagination(pagination) %}
+    {% if pagination.url != '' %}
+        {% set url = pagination.url %}
+    {% endif %}
+    {% if pagination.has_prev %}
+        {% set prev = pagination.page - 1 %}
+    {% else %}
+        {% set prev = 0 %}
+    {% endif %}
+    {% if pagination.has_next %}
+        {% set next = pagination.page + 1 %}
+    {% else %}
+        {% set next = 0 %}
+    {% endif %}
+    <ul class="pagination">
+        <li{% if not pagination.has_prev %} class="disabled"{% endif %}>
+            {% if url %}
+                <a href="{{ url_for('attachments',url=url,page_num=prev) }}">&larr;</a>
+            {% else %}
+                <a href="{{ url_for('pages',item=pagination.item_type,page_num=prev) }}">&larr;</a>
+            {% endif %}
+        </li>
+        {% for page in pagination.iter_pages() %}
+        <li{% if page == pagination.page %} class="active"{% endif %}>
+        {% if not page is none %}
+            {% if url %}
+            <a href="{{ url_for('attachments',url=url,page_num=page) }}">{{ page }}</a>
+            {% else %}
+                <a href="{{ url_for('pages',item=pagination.item_type,page_num=page) }}">{{ page }}</a>
+            {% endif %}
+        {% endif %}
+        </li>
+        {% endfor %}
+        <li{% if not pagination.has_next %} class="disabled"{% endif %}>
+        {% if not next == 0 %}
+            {% if url %}
+                <a href="{{ url_for('attachments',url=url,page_num=next|default(pagination.page)) }}">&rarr;</a>
+            {% else %}
+                <a href="{{ url_for('pages',item=pagination.item_type,page_num=next|default(pagination.page)) }}">&rarr;</a>
+            {% endif %}
+        {% endif %}
+        </li>
+    </ul>
+{% endmacro %}
+
+                
+{% macro render_tab_start() %}
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="tabbable tabs-left">
+                        <div class=row>
+                            <div class="col-lg-4">
+                                <ul class="nav nav-pills nav-stacked">
+{% endmacro %}                                    
+
+{% macro render_attachment_tab(att,count) %}
+    {% if count == 1 %}                                        
+        <li class="active"><a href="#tab1" data-toggle=tab>{{ att['name'] }}</a></li>
+    {% else %}
+        {% set tab = '#tab%d' % count %}   
+        <li><a href="{{ tab }}" data-toggle=tab>{{ att['name'] }}</a></li>
+    {% endif %}
+{% endmacro %}                            
+            
+
+{% macro render_tab_center() %}
+            </ul>   
+        </div>
+        <div class="col-lg-8">
+            <div class=tab-content>
+{% endmacro %}
+
+{% macro render_attachment_content(att,count) %}
+    {% if count == 1 %}
+        <div class="tab-pane active" id=tab1>
+            {{ render_attachment(att) }}
+        </div>
+    {% else %}
+        {% set tab = 'tab%d' % count %}
+        <div class=tab-pane id={{ tab }}>
+           {{ render_attachment(att) }}
+        </div>
+   {% endif %}
+{% endmacro %}                     
+
+{% macro render_tab_end() %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endmacro %}
+
+{% macro render_attachments(atts) %}
+    {{ render_tab_start() }}
+    {% for att in atts %}
+        {{ render_attachment_tab(att,loop.index) }}
+    {% endfor %}
+    {{ render_tab_center() }}
+    {% for att in atts %}
+        {{ render_attachment_content(att,loop.index) }}
+    {% endfor %}
+    {{ render_tab_end() }}
+{% endmacro %}
+
+{% macro render_profile_header(person) %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-xs-4">
+                <div class="well">
+                    <h2>{{ person['name'] }}&#39;s <small>profile</small></h2>
+                </div>
+            </div>
+        </div>
+{% endmacro %}
+
+{% macro render_profile_content(person) %}
+{% if person.starred_projects %}
+    {% set starred = person.starred_projects %}
+{% endif %}
+    <div class="row">
+        <div class="col-lg-8 col-xs-4">
+            <div class="list-group">
+                <a class="list-group-item">Name  <span class="text text-info">{{ person['name'] }}</span></a>
+                <a class="list-group-item">Assigned Todo Count: <span class="text text-info">{{ person['assigned_todos']['count'] }}</span></a>
+                <a class="list-group-item">Event Count: <span class="text text-info">{{ person['events']['count'] }}</span></a>
+                <a class="list-group-item">{{ person['name']|title }} was added to this account {{ person['created_at']|human_time }}</a>
+                {{ starred }}
+                    {% if starred %}
+                        <div class="list group">
+                            <a class="list-group-item">Starred Projects</a>
+                                {% for proj in starred %}
+                                    <a class="list-group-item">{{ proj }}</a>
+                                {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <img class="img-thumbnail" src="{{ person['fullsize_avatar_url'] }}" />
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro close_profile() %}
+    </div>
+{% endmacro %}
+
+{% macro render_profile_page(person) %}
+    {{ render_profile_header(person) }}
+    {{ render_profile_content(person) }}
+    {{ close_profile() }}
 {% endmacro %}

@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_todolist %}
+    {% block body %}
+    <div class="container">
+        {% if tdl %}
+            {{ render_todolist(tdl) }}
+        {% else %}
+            {% if todos %}
+                {% for itm in todos %}
+                    {{ render_todolist(itm) }}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endblock body %}

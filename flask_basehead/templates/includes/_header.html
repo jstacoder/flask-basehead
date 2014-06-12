@@ -1,0 +1,78 @@
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse1">
+                        <span class="sr-only">Toggle Nav</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{{ url_for('index') }}">BaseHead</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse1">
+                    <ul class="nav navbar-nav">
+                        <li {% if request.endpoint == 'index' %}class="active"{% endif %}>
+                            <a href="{{ url_for('index') }}">Home</a>
+                            </li>
+                        {% if bc %}
+                        <li {% if request.endpoint == 'people' %}class="active"{% endif %}>
+                        <a href="{{ url_for('people') }}"><span class="glyphicon glyphicon-user">People</a>
+                        </li>
+                        <li {% if request.endpoint == 'tasks' %}class="active"{% endif %}>
+                        <a href="{{ url_for('tasks') }}"><span class="glyphicon glyphicon-paperclip"></span>Todos{% if 'tasks' not in request.path %}<span class="badge">{{ bc.todo_count }}</span>{% endif %}</a>
+                        </li>
+                        <li {% if request.endpoint == 'events' %}class="active"{% endif %}>
+                        <a href="{{ url_for('events') }}"><span class="glyphicon glyphicon-calendar"></span>Events{% if request.endpoint != 'events' %}<span class="badge">{{ bc.event_count }}</span>{% endif %}</a>
+                        </li>
+                        <li {% if request.endpoint == 'projects' %}class="active"{% endif %}>
+                        <a href="{{ url_for('projects') }}"><span class="glyphicon glyphicon-briefcase"></span>Projects{% if request.endpoint != 'projects' %}<span class="badge">{{ bc.project_count }}</span>{% endif %}</a>
+                        </li>
+                        <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-tasks"></span>Todo Lists<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                <a href="{{ url_for('project_list') }}"><span class="glyphicon glyphicon-send"></span>&nbsp;by Project</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                <a href="{{ url_for('tasklists') }}"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;By Bucket</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                <a href="{{ url_for('todolist') }}"><span class="glyphicon glyphicon-fullscreen"></span>&nbsp;All Todo Lists</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                        {% endif %}
+                    </ul>
+                    <form class="navbar-form navbar-right" role="search">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="search">
+                        </div>
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </form>
+                    <ul class="nav navbar-nav navbar-right" role="navigation">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ url_for('reload',next=request.endpoint) }}">Reload Basecamp</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Action</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Action</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+    
+
+
+                        <!--<li {% if request.endpoint == 'tasklists' %}class="active"{% endif %}>
+                        <a href={{ url_for('tasklists') }}>Tasklists</a></li>-->

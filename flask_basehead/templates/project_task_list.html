@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_project_buckets %} 
+{% block body %}
+    <div class="container">
+        <div class="row">
+            {#<div class="col-lg-1 col-offset-1"></div>#}
+            <div class="col-lg-10 col-offset-2">
+            <h2><span class="label label-default">BaseCamp Tasklists</span>
+            </h2>
+                <h2 class="page-header"><small>With open Todos</small></h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-9">{{ render_project_buckets(buckets) }}</div>
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">sidebar
+                    </div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            {% for itm in buckets %}
+                                <a class=list-group-item href="#{{ itm }}">{{ itm }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+    {% for bkt in buckets %}
+    {{ bkt }}<br />
+    {% endfor %}
+    <hr />
+    {% for itm in buckets['PRC411'] %}
+    {{ itm['content'] }}<br /><br />
+    {% endfor %}

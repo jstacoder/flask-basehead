@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_todo %}
+{% from '_macros.html' import render_todo_links %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-offset-2">
+    <h2>Open todos</h2>
+    <p>{{ render_todo(task)|safe }}</p>
+            {{ render_todo_links(lst,nxt)}} 
+        
+    </div>
+</div>
+</div>
+{% endblock body %}

@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_todo %}
+{% from '_macros.html' import render_todo_link %}
+<div class=container>
+    <br /><p>{{ lists['bucket'] }}</p>
+    <p>{{ lists['name'] }}</p>
+
+    <hr />
+</div>
+<div><p>tasks</p>
+    {{ tasks }}</div>
+{% block body %}
+
+   <div class="container">
+       <div class=header>
+           <h2>All Open Todos</h2>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-offset-1">
+                <div><p>sidebar</p></div>
+            </div>
+            <div class="col-lg-8">
+                {% if  tasks %}
+                <ul class=list-group>
+                    {% for todo in tasks %}
+                        <li class=list-group-item>    
+                            <p>Todo# {{ loop.index }}</p>
+                            <div>
+                                {% set count = loop.index %}
+                                <div>
+                                    <p>{{ todo.content }}<p>
+                                    {{ render_todo_link(todo.id) }}
+                                </div>
+                            </div>
+                        </li>
+                        <hr />
+                        <br />
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock body %}

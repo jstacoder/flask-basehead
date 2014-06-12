@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_lite_project %}
+{% from '_macros.html' import render_project %}
+    {% block body %}
+    <div class="container">
+        <div class=row>
+            <div class=col-lg-8>
+                <h2 class=page-header>{{ bc.name|title }}&#39;s Active Projects</h2>
+            </div>
+            <div class=col-lg-4>
+                <div class=list-group>
+                    <a href=# class=list-group-item>
+                        You have <span class=text-warning>X</span> active projects with open todos,
+                        click here to see them
+                    </a>
+                </div>  
+                <a href={{ url_for('tasklists') }} class="btn-block btn btn-primary">Active Projets</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="pull-left btn-group-vertical">
+                    {% for project in projects %}
+                        {{ render_lite_project(project) }}
+                    {% endfor %}
+                </div>
+            </div>
+                {% if project %}
+            <div class="pull-right col-md-7">
+                {{ render_project(project) }}
+            </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endblock %}

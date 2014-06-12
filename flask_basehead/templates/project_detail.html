@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_project %}
+        <div class=container>
+            <div class="row">
+                {% for p in project %}
+                    <div class="col-lg-6 col-offset-6">
+                        <p>{{ p }} &#060;-- key</p>
+
+                        <p>{{ project[p] }}  &#060;-- value</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% block body %}
+    {{ render_project(project) }}
+    {% endblock body %}

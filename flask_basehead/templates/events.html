@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_attachments, render_pagination %}
+    {% block body %}
+       {% if atts %}
+            {{ render_attachments(atts) }}
+            {{ render_pagination(p) }}
+        {% endif %}
+    {% endblock %}
+
+    

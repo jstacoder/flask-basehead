@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_person %}
+{% block body %}
+    <div class="container">
+        <div class=row>
+            <div class="col-xs-6 col-md-12">
+                <div class="well">
+                    <h2 class="heading">{{ bc.name }}&#39;s <small>Basecamp</small></h2>
+                </div>
+            </div>
+        </div>
+        <div class=row>
+            <div class=col-md-6>
+                <img class="img-thumbnail" src="{{ bc.fullsize_avatar_url }}" height="200px" width="200px" border="2px solid black" style="padding-left:5px;"/>
+            </div>
+            <div class="col-md-6 col-xs-4">
+                <div class="page-header"><h2>Latest events</h2></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-xs-6">
+                <p>
+                    <a href="mailto:{{ bc.email_address }}">{{ bc.email_address }}</a>
+                </p>
+                <p class="lead">
+                    <span class="label label-default">Todos Outstanding: {{ bc.todo_count }}</span>
+                </p>
+                <p>
+                <a  class="btn btn-default btn-sm" roll="button" href="{{ url_for('tasks') }}">See open todos</a>
+                </p>
+                <p class="lead">
+                    <span class="label label-default">Open Projects: {{ bc.project_count }}</span>
+                </p>
+                <p>
+                    <a class="btn btn-default btn-sm" roll="button" href="{{ url_for('projects') }}">see open projects</a>
+                </p>
+            </div>
+            <div class="col-md-6 col-xs-6">
+                        <p class="lead">
+                            <span class="label label-default">Event Count:</span> <span class="label label-default"><small>{{ bc.event_count }}</small></span>
+                        </p>
+                        {% set event_count = 2 %}
+                        {% for event in bc.events %}
+                            {% if event_count > 0 %}    
+                                {% set event_count = event_count - 1 %}
+                                <div class="well">
+                                <p>
+                                    {{ event['summary']|safe|truncate(150) }}
+                                </p>
+                                <p>
+                                    <a class="btn btn-default" roll="button" href="{{ url_for('events',event_id=event['id']) }}">read more</a>
+                                </p>
+                                </div>
+                                <br />
+                            {% endif %}
+                        {% endfor %}
+                <a class="btn btn-sm" role="button" href="{{ url_for('events') }}">See all</a>
+            </div>
+        </div>
+    </div>
+{% endblock body %}

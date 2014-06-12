@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+    {% block extra_head %}
+        {{ codemirror.include_codemirror() }}
+    {% endblock extra_head %}
+    {% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-offset-8">                
+                <form>
+                    {{ form.source_code }}
+                    {{ form.submit }}
+                </form>
+            </div>
+        </div>
+        </div>
+        {% endblock body %}

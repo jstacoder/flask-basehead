@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_form with context %}
+    {% block content %}
+    <form method="post" action="{{ url_for('login') }}">
+        {{ render_form(form) }}
+        <input type="submit" value="login" />
+    </form>
+    {% endblock %}
+
+
+        

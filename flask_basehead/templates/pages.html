@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_pagination, render_person_inline, render_event, render_project, render_todo,render_attachments %}
+    {% block body %}
+    <div class="container">
+        {% if p.item_type != 'attachments' %}
+            <div class="page-header">
+                <p class="lead">{{ p.item_type }}</p>
+            </div>
+        {% endif %}
+    {% if page %}
+        {% if p.item_type == 'attachments' %}
+            {{ render_attachments(page) }}
+        {% else %}
+            {% for itm in page %}
+                {% if p.item_type == 'people' %}
+                    {{ render_person_inline(itm) }}
+                {% elif p.item_type == 'events' %}
+                    {{ render_event(itm) }}
+                {% elif p.item_type == 'todos' %}
+                    {{ render_todo(itm) }}
+                {% elif p.item_type == 'project' %}
+                    {{ render_project(itm) }}        
+                {% else %}
+                    <p class="text text-error">Cannot Render {{ p.item_type }}</p>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {{ render_pagination(p) }}
+    {% endif %}
+    </div>
+    {% endblock body %}

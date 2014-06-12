@@ -1,0 +1,7 @@
+{% extends 'layout.html' %}
+{% from '_macros.html' import render_profile_page %}
+    {% block content %}
+        {% if person %}
+            {{ render_profile_page(person) }}
+        {% endif %}
+    {% endblock content %}
